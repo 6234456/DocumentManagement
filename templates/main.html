@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de" >
+<head>
+    <!-- Angular Material style sheet -->
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='md-data-table.min.css') }}">
+    {% raw %}
+    <style>
+        * {
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        input, .md-select-value {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 14px;
+        }
+
+        md-toolbar:not(.md-menu-toolbar) md-icon {
+        color: rgb(255, 255, 255) !important;
+        }
+
+
+        .hint {
+        /* Position the hint */
+        position: absolute;
+        left: 2px;
+        right: auto;
+        bottom: 7px;
+        /* Copy styles from ng-messages */
+        font-size: 12px;
+        line-height: 14px;
+        transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+        /* Set our own color */
+        color: grey; }
+    </style>
+</head>
+<body ng-app="myapp" ng-cloak>
+<!--
+  Your HTML content here
+-->
+
+
+
+<div ng-controller="AppCtrl">
+    <md-content>
+        <md-tabs md-dynamic-height md-border-bottom md-selected="activeTabNr">
+            <md-tab label="Overview">
+                <md-content class="md-padding">
+
+                   <md-table-container>
+                      <table md-table md-row-select multiple ng-model="selected" >
+                        <thead md-head md-order="query.order" >
+                          <tr md-row>
+                            <th md-column md-order-by="nameToLower"><span>Name</span></th>
+                            <th md-column md-order-by="nameToLower"><span>Description</span></th>
+                            <th md-column md-order-by="nameToLower">Category</th>
+                            <th md-column>Tags</th>
+                            <th md-column>Archive No.</th>
+                            <th md-column>Position</th>
+                            <th md-column>Subsidiary</th>
+                            <th md-column>Signed On</th>
+
+                          </tr>
+                        </thead>
+                        <tbody md-body>
+                          <tr md-row md-select="dessert" md-select-id="name" md-auto-select ng-repeat="i in data">
+                            <td md-cell>{{i.name}}</td>
+                            <td md-cell>{{i.desc}}</td>
+                            <td md-cell>{{i.categoryName}}</td>
+                            <td md-cell>{{i.tagsName.trim().slice(1,-1)}}</td>
+                            <td md-cell>{{i.archive.name}}</td>
+                            <td md-cell>{{i.pos}}</td>
+                            <td md-cell>{{i.subsidiariesName.trim().slice(1,-1)}}</td>
+                            <td md-cell>{{i.signed_on | date :"yyyy-MM-dd"}}</td>
+                            <td md-cell>
+                                <md-button class="md-icon-button" aria-label="filter" ng-click="selectItem($index)">
+                                    {% endraw %}
+                                    <md-icon md-svg-src="{{ url_for('static', filename='icons/modify.svg') }}" ></md-icon>
+                                    {% raw %}
+                                </md-button>
+                                <md-button class="md-icon-button" aria-label="filter" ng-click="deleteItem($index)">
+                                    {% endraw %}
+                                    <md-icon md-svg-src="{{ url_for('static', filename='icons/delete.svg') }}" ></md-icon>
+                                    {% raw %}
+                                </md-button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </md-table-container>
+
+                    <md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{desserts.count}}"  md-page-select></md-table-pagination>
+                </md-content>
+            </md-tab>
+            <md-tab label="Neue Stelle">
+                <md-content class="md-padding">
+
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>URL</label>
+                        <input name="url" ng-model="queryURL" />
+                        <div class="hint">Bitte URL hier hinzufügen!</div>
+                    </md-input-container>
+
+                </md-content>
+            </md-tab>
+
+            <md-tab label="Document">
+                <md-content class="md-padding">
+                    <div>
+                        <form id="userForm">
+
+                            <div layout="row" div class="md-inline-form">
+                                <md-input-container class="md-block"  flex="20">
+                                    <label>Name</label>
+                                    <input ng-model="current.name">
+                                </md-input-container>
+
+                                <md-input-container class="md-block"  flex="30">
+                                    <label>Description</label>
+                                    <input ng-model="current.desc">
+                                </md-input-container>
+
+                                <md-input-container class="md-block"  flex="15">
+                                    <label>Category</label>
+                                    <input ng-model="current.categoryName">
+                                </md-input-container>
+
+                                <md-input-container class="md-block"  flex="8">
+                                    <label>Archive No.</label>
+                                    <input ng-model="current.archive.name">
+                                </md-input-container>
+
+                                <md-input-container class="md-block"  flex="4">
+                                    <label>Position</label>
+                                    <input ng-model="current.pos">
+                                </md-input-container>
+
+                                <md-input-container class="md-block" flex="23">
+                                    <label>Path</label>
+                                    <input ng-model="current.path">
+                                </md-input-container>
+                                
+                            </div>
+                            <div layout="row" class="md-inline-form">
+                                 <md-input-container class="md-block" flex="100">
+                                    <label>Subsidiaries</label>
+                                    <md-chips ng-model="current.subsidiaries" md-autocomplete-snap
+                                          md-transform-chip="transformChip($chip)"
+                                          md-require-match="true"
+                                          >
+                                      <md-autocomplete
+                                          md-selected-item="selectedItemSubsi"
+                                          md-search-text="searchTextSubsi"
+                                          md-items="item in querySearchSubsidiary(searchTextSubsi)"
+                                          md-item-text="item.name"
+                                          >
+                                        <span md-highlight-text="searchTextSubsi">{{item.name}}</span>
+                                      </md-autocomplete>
+                                      <md-chip-template>
+                                        <span>
+                                          {{$chip.name}}
+                                        </span>
+                                      </md-chip-template>
+                                    </md-chips>
+                                </md-input-container>
+                            </div>
+
+
+                            <div layout-gt-sm="row">
+                                 <md-input-container class="md-block" flex="100">
+                                    <label>Tags</label>
+                                    <md-chips ng-model="current.tags" md-autocomplete-snap
+                                          md-transform-chip="transformChip($chip)"
+                                          md-require-match="false"
+                                          >
+                                      <md-autocomplete
+                                          md-selected-item="selectedItemTag"
+                                          md-search-text="searchTextTag"
+                                          md-items="item in querySearchTag(searchTextTag)"
+                                          md-item-text="item.name"
+                                          >
+                                        <span md-highlight-text="searchTextTag">{{item.name}}</span>
+                                      </md-autocomplete>
+                                      <md-chip-template>
+                                        <span>
+                                          {{$chip.name}}
+                                        </span>
+                                      </md-chip-template>
+                                    </md-chips>
+                                </md-input-container>
+                            </div>
+
+                             <div layout="row" class="md-inline-form">
+                                <md-datepicker ng-model="current.signed_on" md-placeholder="Signed On"></md-datepicker>
+                            </div>
+
+                             <div layout="row" class="md-inline-form">
+                                 <md-button ng-click="addNewTags()">Click</md-button>
+                             </div>
+                            
+                        </form>
+                    </div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+    </md-content>
+</div>
+
+{% endraw %}
+
+
+
+
+<!-- Angular Material requires Angular.js Libraries -->
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-aria.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-messages.min.js"></script>
+
+<!-- Angular Material Library -->
+<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.js"></script>
+
+<!-- Your application bootstrap  -->
+<script type="text/javascript" src="{{ url_for('static', filename='md-data-table.min.js') }}"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+
+</body>
+</html>
