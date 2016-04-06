@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from ORM import DBUtil, Document, Tag, Partner, Archive, Subsidiary, User
+from ORM import DBUtil, Document, Tag, Partner, Archive, Subsidiary, User, Category
 from json import dumps
 
 app = Flask(__name__, static_url_path='')
@@ -38,6 +38,10 @@ def docs():
 @app.route("/subsidiaries")
 def subsidiaries():
     return dumps([{"name":i.name, "id":i.id} for i in db.session.query(Subsidiary).filter(True).all()])
+
+@app.route("/categories")
+def categories():
+    return dumps([{"name":i.name, "id":i.id} for i in db.session.query(Category).filter(True).all()])
 
 @app.route("/tags")
 def tags():

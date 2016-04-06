@@ -35,6 +35,12 @@
         transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
         /* Set our own color */
         color: grey; }
+
+        #cate-container md-autocomplete-wrap  {
+            border:none;
+            box-shadow:none;
+            background:none!important;
+        }
     </style>
 </head>
 <body ng-app="myapp" ng-cloak>
@@ -123,9 +129,24 @@
                                     <input ng-model="current.desc">
                                 </md-input-container>
 
-                                <md-input-container class="md-block"  flex="15">
+                                <md-input-container class="md-block"  flex="15" id="cate-container">
+
                                     <label>Category</label>
-                                    <input ng-model="current.categoryName">
+                                    <!--<input ng-model="current.categoryName">-->
+
+                                    <md-autocomplete
+                                            md-search-text="categorySearchText"
+                                            md-items="item in all_categories"
+                                            md-selected-item-change="categorySelectedItemChange(item)"
+                                            md-item-text="item.name"
+                                            md-min-length="0"
+                                            >
+                                        <md-item-template>
+                                            <span md-highlight-text="categorySearchText" md-highlight-flags="^i">{{item.id + " " + item.name}}</span>
+                                        </md-item-template>
+
+                                    </md-autocomplete>
+
                                 </md-input-container>
 
                                 <md-input-container class="md-block"  flex="8">
@@ -198,7 +219,7 @@
                             </div>
 
                              <div layout="row" class="md-inline-form">
-                                 <md-button ng-click="addNewTags()">Click</md-button>
+                                 <md-button ng-click="myshow()">Click</md-button>
                              </div>
                             
                         </form>
