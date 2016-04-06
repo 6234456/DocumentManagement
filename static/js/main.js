@@ -3,12 +3,10 @@
     var app = angular.module('myapp', ['ngMaterial', 'md.data.table'])
     .controller('AppCtrl', function($scope, $http, $mdToast, $mdDialog, $filter) {
         $scope.activeTabNr = 0;
-        $scope.sortOrder = true;
 
         $scope.selected = [];
         $scope.selectedItemSubsi = null;
         $scope.selectedItemTag = null;
-
 
         $scope.searchTextSubsi = "";
         $scope.searchTextTag = "";

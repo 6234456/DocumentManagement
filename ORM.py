@@ -153,7 +153,6 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), unique=True)
 
-
     def __init__(self, id, name):
         self.id = id
         self.name = name

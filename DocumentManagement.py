@@ -81,9 +81,6 @@ def add_tag():
     # db.session.add(tags)
     return "OK"
 
-
-
-
 @app.route("/change_doc", methods=['POST'])
 def change_doc():
     db.openSession()
